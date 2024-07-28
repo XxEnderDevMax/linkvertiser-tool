@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Bypasser</title>
+    <style>
+        #output {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="urlInput" placeholder="Enter the URL">
+    <button onclick="bypassLink()">Bypass URL</button>
+    <br>
+    <textarea id="output" readonly></textarea>
+
+    <script>
+        function bypassLink() {
+            var url = document.getElementById("urlInput").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://api.bypass.vip/bypass?url=' + encodeURIComponent(url), true);
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var response = JSON.parse(xhr.responseText);
+                    document.getElementById("output").value = response.result || "Bypassed URL not found";
+                } else {
+                    document.getElementById("output").value = "Error: Failed to bypass the URL";
+                }
+            };
+
+            xhr.onerror = function() {
+                document.getElementById("output").value = "Error: Request failed";
+            };
+
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
