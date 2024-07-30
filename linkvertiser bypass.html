@@ -5,20 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Link Bypasser</title>
     <style>
-        #output {
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+        }
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 200px;
+            height: 100%;
+            z-index: -1;
+        }
+        #urlInput {
+            width: 300px;
+            padding: 10px;
             margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #output {
+            width: 300px;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            resize: none;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .modal-button {
+            margin: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <canvas id="stars"></canvas>
     <input type="text" id="urlInput" placeholder="Enter the URL">
     <button onclick="bypassLink()">Bypass URL</button>
-    <br>
     <textarea id="output" readonly></textarea>
 
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <p>URL has been bypassed successfully!</p>
+            <button class="modal-button" onclick="copyResult()">Copy Result</button>
+            <button class="modal-button" onclick="openResult()">Open Result</button>
+        </div>
+    </div>
+
     <script>
+        // 星空背景动画
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const stars = [];
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                vx: Math.floor(Math.random() * 50) - 25,
+                vy: Math.floor(Math.random() * 50) - 25
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = "lighter";
+            for (let i = 0, x = stars.length; i < x; i++) {
+                const s = stars[i];
+                ctx.fillStyle = "#fff";
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, 2 * Math.PI);
+                ctx.fill();
+                s.x += s.vx / 30;
+                s.y += s.vy / 30;
+                if (s.x < 0 || s.x > canvas.width) s.vx = -s.vx;
+                if (s.y < 0 || s.y > canvas.height) s.vy = -s.vy;
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+
         function bypassLink() {
             var url = document.getElementById("urlInput").value;
 
@@ -29,6 +140,7 @@
                 if (xhr.status >= 200 && xhr.status < 300) {
                     var response = JSON.parse(xhr.responseText);
                     document.getElementById("output").value = response.result || "Bypassed URL not found";
+                    document.getElementById("resultModal").style.display = "block";
                 } else {
                     document.getElementById("output").value = "Error: Failed to bypass the URL";
                 }
@@ -39,6 +151,30 @@
             };
 
             xhr.send();
+        }
+
+        function copyResult() {
+            var outputText = document.getElementById("output");
+            outputText.select();
+            document.execCommand("copy");
+            alert("Result copied to clipboard!");
+            document.getElementById("resultModal").style.display = "none";
+        }
+
+        function openResult() {
+            var result = document.getElementById("output").value;
+            if (result.startsWith("http")) {
+                window.open(result, '_blank');
+            } else {
+                alert("Invalid URL");
+            }
+            document.getElementById("resultModal").style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("resultModal")) {
+                document.getElementById("resultModal").style.display = "none";
+            }
         }
     </script>
 </body>
