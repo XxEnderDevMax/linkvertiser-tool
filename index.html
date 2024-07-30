@@ -79,6 +79,19 @@
             border-radius: 3px;
             cursor: pointer;
         }
+        .rainbow-text {
+            font-size: 18px;
+            font-weight: bold;
+            background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: rainbow-animation 5s linear infinite;
+        }
+        @keyframes rainbow-animation {
+            to {
+                background-position: 450vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -89,7 +102,7 @@
 
     <div id="resultModal" class="modal">
         <div class="modal-content">
-            <p>URL has been bypassed successfully!</p>
+            <p class="rainbow-text">URL has been bypassed successfully!</p>
             <button class="modal-button" onclick="copyResult()">Copy Result</button>
             <button class="modal-button" onclick="openResult()">Open Result</button>
         </div>
